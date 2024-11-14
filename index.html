@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TÖDLICHES TRINKTEUFELSRAD</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+  }
+  #circle {
+    width: 200px;
+    height: 200px;
+    background-color: lightgray;
+    border-radius: 50%;
+    margin: 50px auto;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    text-align: center;
+    line-height: 1.2; /* Erhöht die Lesbarkeit bei mehrzeiligem Text */
+  }
+  #categories {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .letter {
+    display: inline-block;
+    padding: 15px 20px; /* Größere Polsterung für größere Buchstabenfelder */
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    margin: 5px;
+    cursor: pointer;
+  }
+  .letter-row {
+    margin-bottom: 10px; /* Abstand zwischen den Zeilen */
+  }
+  #click-counter {
+    font-weight: bold;
+    color: darkgreen;
+    text-align: center;
+    margin-top: 20px;
+  }
+  #end-timer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-weight: bold;
+    font-size: 20px;
+    color: red;
+    display: none;
+  }
+  .popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border: 2px solid #000;
+    z-index: 1000;
+  }
+  .popup-content {
+    text-align: center;
+  }
+  .popup button {
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1 style="text-align:center;">Von A bis Z</h1>
+
+
+<div id="circle" onclick="showCategory()">Klicke hier<br>für eine Kategorie</div>
+
+<div id="categories"></div>
+
+<div id="click-counter">Klicks: <span id="clicks">0</span></div>
+
+<div id="end-timer"></div>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h2>Runde beendet!</h2>
+    <p>Klicks: <span id="popup-clicks">0</span></p>
+    <button onclick="resetGame()">Neue Runde starten</button>
+  </div>
+</div>
+
+<script>
+  // Array der Kategorien
+  var categories = [
+    "Automarken", "Zahlen (Schreibweise)", "Musiklieder", "Videospiele", "Filme", "Deutsche Filme", "Reime auf Klein", "Reime auf Haus", "Reime auf Hand", "Reime auf Licht", "Reime auf Traum", "Reime auf Kaiser", "Deutsche Musiker", "Sportarten", "Getränke", "Lebensmittel", "Obst", "Gemüse", "Tiere", "Städte in Bayern", "Städte in Baden-Württemberg", "Städte in Ostdeutschland", "Städte in Hessen", "Städte in Rheinland Pfalz", "Küchenutensilien", "Sportwetten-Anbieter", "Glücksspielarten", "Städte in Österreich", "Städte in der Schweiz", "Städte in England", "Länder in Nord- und Mittelamerika", "Trash-TV Serien", "Comicfiguren", "Podcasts", "Deutsche Schauspieler", "Shots", "Versicherungskonzerne", "Pornostars", "Malle-Sänger", "Musikgruppen", "Schauspieler", "Malle-Lieder", "Alkoholische Getränke", "Beleidigungen", "Italienische Persönlichkeiten", "Porno-Websites", "Sänger", "Baumarten", "Studiengänge", "Kleidungsmarken", "Möbel", "Promis", "Banken", "Superhelden", "Social-Media-Plattformen", "Illegale Drogen", "Städte in Frankreich", "Obstsorten", "McDonalds-Produkte", "Berufe", "Körperteile", "Harry Potter Charaktere", "Zeitungen", "Sportler", "Unternehmen", "Ehemalige Fußballprofis", "TV-Serien", "Zigarettenmarken", "Trinkspiele", "Luxusmarken", "Länder in Afrika", "Süßigkeiten", "Politische Parteien in Deutschland", "Bundesstaaten in der USA", "Fußballvereine", "Politiker", "Länder in Asien", "Hunderassen", "Hauptstädte der Welt", "Münchner U-Bahn-Stationen", "Städte in Deutschland", "Disney-Filme", "Chemische Elemente", "Länder in Europa", "Cola-Marken", "Gesellschaftsspiele", "Pizzavarianten", "Biermarken", "Influencer", "Länder in Südamerika", "Aktive Fußballprofis", "Musikgenres", "Musikinstrumente", "Fast-Food-Ketten", "Milliardäre auf der Welt", "Zeichentrickfiguren", "Porno-Kategorien", "Städte in Italien", "Länder in Ozeanien", "Wörter auf Spanisch", "Wörter auf Italienisch", "Wörter auf Englisch", "Wörter auf Französisch", "Farben", "Das Wort Hallo in anderen Sprachen", "Städte in Spanien", "Kinderserien", "Fernsehmoderatoren", "Fernsehsender", "Radiosender", "Sportarten ohne Ball", "Schuhmarken", "Straftaten", "Pflanzenarten", "Breaking Bad Charaktere", "Die Simpsons Charaktere", "Game Of Thrones Charaktere", "Star Wars Charaktere", "Spongebob Schwammkopf Charaktere", "Fast & Furious Charaktere", "Herr der Ringe Charaktere", "Microsoft Programme", "Apps im AppStore", "Wassermarken", "Tankstellen", "Wörter, die sich auf Regen reimen", "Wörter, die in der deutschen Nationalhymne vorkommen", "Clubs in München", "Supermärkte", "Musikstreaming-Anbieter", "Wodkamarken", "Bars/Kneipen in München", "Länder, in deren Flagge Schwarz ist", "E-Mail-Anbieter", "Länder, in deren Flagge Blau ist", "Mobilfunk-Anbieter", "Länder, in deren Flagge Weiß ist", "Währungen", "Länder, in deren Flagge Rot ist", "Weihnachtsfilme", "Länder, in deren Flagge Grün ist", "Lieder von Queen", "Länder, in deren Flagge Gelb ist", "Lieder von The Beatles", "Deutsche Vornamen", "Lieder von Michael Jackson", "Französische Vornamen", "Lieder von Taylor Swift", "Italienische Vornamen", "Synonyme für 'Küssen'", "Englischsprachige Vornamen", "Synonyme für 'Stuhlgang'", "Kaffeemarken", "Synonyme für 'Übergeben'", "Länder, die früher zur Sowjetunion gehörten", "Synonyme für 'Urinieren'", "Lateinische Wörter", "Synonyme für 'Alkohol trinken'", "Krankenhaus-Serien", "E-Scooter Anbieter", "Serien, in denen es um eine Freundesgruppe geht", "Gerichte aus der asiatischen Küche", "Organe", "Tiere, die in Deutschland beheimatet sind (ohne Zootiere)", "Dinge, die man mit Frankreich verbindet", "Aktive oder ehemalige Tennisspieler", "Dinge, die man mit Italien verbindet", "Zootiere", "Dinge, die man mit Deutschland verbindet", "Berufe im Freien", "Dinge, die man mit Spanien verbindet", "Flüsse", "Dinge, die man mit Japan verbindet", "Hotelketten", "Dinge, die man mit der USA verbindet", "Steuerarten", "Dinge, die man mit China verbindet", "Synonyme für 'sprechen'", "Dinge, die man mit Russland verbindet", "Schulfächer", "Aktive oder ehemalige YouTuber", "Ketchup-Marken", "Zahnpasta-Marken", "Milchsorten", "Sportartikelhersteller", "US-Amerikanische Persönlichkeiten", "Sportarten, die auf Sport1 übertragen werden", "Arten von Ärzten", "Kündigungsgründe", "Aktuelle oder ehemalige Serien auf Pro7", "Eissorten", "Aktuelle oder ehemalige Serien auf Sat1", "Charaktereigenschaften", "Aktuelle oder ehemalige Sendungen auf Super RTL/KIKA", "Verben", "Möbelläden", "Nomen", "Schriftsteller", "Fortbewegungsmittel", "Kinderspielzeuge", "Sprachen", "Olympioniken", "Büromaterial", "Eistee-Marken", "Hauptstädte in Europa", "Hauptstädte in Asien", "Autoren", "Hauptstädte in Afrika", "Sexspielzeuge", "Hauptstädte in Südamerika", "Nachtische", "Hauptstädte in Nord- und Mittelamerika", "Semmelsorten", "Tiere mit mehr als 4 Beinen", "Kartoffelprodukte", "Verwandtschaftsgrade", "Superkräfte", "Animeserien", "Abteilungen in einem Unternehmen", "Pokémons", "Hobbies", "NFL-Teams", "Kosenamen", "NHL-Teams", "Grüne Gegenstände", "NBA-Teams", "Rote Gegenstände", "Deutsche Eishockey-Vereine", "Blaue Gegenstände", "Deutsche Basketball-Vereine", "Gelbe Gegenstände", "Pixar-Filme", "Schwarze Gegenstände", "Pixar-Charaktere", "Weiße Gegenstände", "Disney-Charaktere", "Weihnachtsgeschenke", "Schachfiguren", "Käsesorten", "K-Pop Gruppen", "Teesorten", "US-Präsidenten", "Synonyme für 'Sex haben'", "Glaubensrichtungen", "Suppen", "Englischsprachige Wörter im deutschen Sprachgebrauch", "Krankheiten", "Rapper mit dem Präfix 'Lil'", "Straßennamen in München", "Nomen, die im Lied 'Major Tom' vorkommen", "Basketballer", "Nomen, die im Lied 'Skandal im Sperrbezirk' vorkommen", "Leichtathleten", "Länder, die Fußball-Weltmeister geworden sind", "American Football Spieler", "Gegenstände, die man auf einem Campingplatz findet", "Maler", "Wörter, die 'Bär' enthalten", "Länder mit Monarchien", "Dinge, die fliegen können", "Ehemalige oder Aktive Monarchen", "Dinge, die nicht fliegen können", "Deutsche Flüsse", "Tiere, die fliegen können", "Flüsse", "Tiere, die nicht fliegen können", "Baumarkt-Artikel", "Länder, die weder den Euro noch Dollar haben", "Wörter mit 3 Buchstaben", "Möglichkeiten der Kommunikation", "Gewürze", "Vorinstallierte Apps auf dem iPhone", "Synonyme für Penis", "Arten von Behältern", "Synonyme für Vagina", "Getränke, die blau sind", "Synonyme für Sperma", "Synonyme für Masturbieren", "Getränke, die rot sind", "Dinge, die man betrunken macht", "Getränke, die gelb sind", "Fitnessstudios", "Fiktive TV-Unternehmen", "Getränke, die schwarz sind", "Fahrradhersteller", "Getränke, die braun sind", "Chipsmarken", "Getränke, die durchsichtig sind", "Schokoladenmarken", "Arten von Blumen", "Fiktive Orte aus TV-Serien/Filmen", "Dinge, die man um sein Handgelenk tragen kann", "Musiker, die bereits verstorben sind", "Kopfhörer-Marken", "Kartenspiele", "Schwarze Musiker", "Spielkonsolen", "Synonyme für Auto", "Fernsehköche", "Synonyme für Haus", "Kuchen", "Synonyme für Arbeit", "Deutsche Gerichte", "Synonyme für Freund*in", "Kryptowährungen", "Synonyme für essen", "Produktarten, die Apple anbietet", "Synonyme für Geld", "Preisvergleich-Anbieter", "Synonyme für Frau", "Tiere, die fliegen können", "Synonyme für Mann", "Dichter", "Synonyme für Diskothek", "Kaugummihersteller", "Pokemon-Editionen", "Netflix Originals", "Charaktere aus dem Donald-Duck-Universum", "Burgerketten", "Charaktere aus dem Lucky Luke Universum", "Brillengeschäfte", "Tiere ohne Fell", "Essen, das man beim Dönermann bestellen kann", "Tiere mit Fell", "Marvel Superhelden", "Millionenstädte", "DC Superhelden", "Länder, die mehr als 100 Millionen Einwohner haben", "Streaming-Dienste", "Weihnachtsfilme", "Aktiengesellschaften", "Promis, die den Vornamen Tom haben", "Musikgenres", "Promis, die den Vornamen John haben", "Internet-Suchmaschinen", "Promis, die den Vornamen Jennifer haben", "Browser", "Promis, die den Vornamen David haben", "Schulen in München", "Promis, die den Vornamen Chris haben", "Tanzstile", "Dinge, die man sich anziehen kann", "Olympische Disziplinen", "Dinge, die man in einem Park findet", "Märchen", "Dinge, die man in einer Schule findet", "Festivals", "Dinge, die man in einem Supermarkt findet", "Ausbildungsberufe", "Sätze, die Eltern häufig zu ihren Kindern sagen", "Fabelwesen", "Gerichte mit Reis", "Lieferdienste", "Essenskategorien bei Lieferando", "Nachspeisen beim Italiener", "Deutsche Persönlichkeiten", "Französische Persönlichkeiten", "Britische Persönlichkeiten", "Hochzeitstraditionen", "Planeten im Universum", "Berühmte Comedian", "Berühmte Stand-Up Comedian", "Straßen in Monopoly", "Musiker, die für ihre Weihnachtsmusik bekannt sind", "Kirchen"
+
+  ];
+
+  // Buchstaben von A bis Z
+  var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+  // Zufällige Kategorie auswählen
+  function selectCategory() {
+    if (categories.length === 0) {
+      console.log("Keine Kategorien mehr verfügbar.");
+      return null; // Rückgabe null wenn keine Kategorien mehr vorhanden sind
+    }
+    var index = Math.floor(Math.random() * categories.length);
+    var category = categories[index];
+    console.log("Ausgewählte Kategorie: ", category); // Debugging-Ausgabe
+    return category;
+  }
+
+  // Kategorie anzeigen
+  function showCategory() {
+    var category = selectCategory();
+    if (!category) {
+      category = "Keine Kategorie verfügbar";
+    }
+    document.getElementById("circle").innerHTML = category;
+    var categoriesElement = document.getElementById("categories");
+    categoriesElement.innerHTML = ""; // Leeren vor dem Hinzufügen der Buchstaben
+    var letterRow1 = document.createElement("div");
+    letterRow1.classList.add("letter-row");
+    var letterRow2 = document.createElement("div");
+    letterRow2.classList.add("letter-row");
+    for (var i = 0; i < alphabet.length; i++) {
+      var letterElement = document.createElement("div");
+      letterElement.textContent = alphabet[i];
+      letterElement.classList.add("letter");
+      letterElement.onclick = function() {
+        clickLetter(this);
+      };
+      if (i < 13) {
+        letterRow1.appendChild(letterElement);
+      } else {
+        letterRow2.appendChild(letterElement);
+      }
+    }
+    categoriesElement.appendChild(letterRow1);
+    categoriesElement.appendChild(letterRow2);
+    startTimers();
+  }
+
+  // Klickzähler
+  var clicks = 0;
+  function clickLetter(letter) {
+    letter.style.backgroundColor = "#ccc"; // Grau einfärben
+    clicks++;
+    document.getElementById("clicks").textContent = clicks;
+  }
+
+  // Timer für das Ende der Runde
+  var timerInterval;
+  function startTimers() {
+    var endTimerDuration = Math.floor(Math.random() * (50000 - 10000 + 1)) + 10000; // Zufällige Zeit zwischen 10 und 50 Sekunden
+    var timerElement = document.getElementById("end-timer");
+    timerElement.textContent = "00:00";
+    timerElement.style.display = "block";
+    var seconds = 0;
+    clearInterval(timerInterval); // Vorherigen Timer löschen
+    timerInterval = setInterval(function() {
+      seconds++;
+      timerElement.textContent = formatTime(seconds);
+    }, 1000);
+    setTimeout(function() {
+      clearInterval(timerInterval); // Timer stoppen, wenn die Runde endet
+      endRound();
+    }, endTimerDuration);
+  }
+
+  // Timer-Formatierung
+  function formatTime(seconds) {
+    var mins = Math.floor(seconds / 60);
+    var secs = seconds % 60;
+    return (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
+  // Rundenende
+  function endRound() {
+    document.body.style.backgroundColor = "red";
+    var endTimer = document.getElementById("end-timer");
+    endTimer.textContent = "Runde beendet!";
+    var clicks = document.getElementById("clicks").textContent;
+    var popupClicks = document.getElementById("popup-clicks");
+    popupClicks.textContent = clicks;
+    var popup = document.getElementById("popup");
+    popup.style.display = "block";
+  }
+
+  // Spiel zurücksetzen
+  function resetGame() {
+    document.body.style.backgroundColor = "#f9f9f9";
+    var endTimer = document.getElementById("end-timer");
+    endTimer.style.display = "none";
+    document.getElementById("circle").innerHTML = "Klicke hier<br>für eine Kategorie";
+    document.getElementById("categories").innerHTML = "";
+    document.getElementById("clicks").textContent = "0";
+    clicks = 0;
+    var popup = document.getElementById("popup");
+    popup.style.display = "none";
+    // Zurücksetzen der Kategorien, falls du dies möchtest
+    // categories = [...initialCategoriesArray]; // Setze categories zurück, falls notwendig
+    showCategory();
+  }
+</script>
+
+</body>
+</html>
